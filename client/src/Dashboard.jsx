@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
-
+const API_BASE_URL = 'https://pharmalab-api.onrender.com';
 function Dashboard() {
   // Authentication State
   const [currentUser, setCurrentUser] = useState(() => {
