@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
 function Dashboard() {
   // Authentication State
@@ -64,11 +65,11 @@ function Dashboard() {
     setLoading(true);
     try {
       const [productsRes, batchesRes, testsRes, resultsRes, deviationsRes] = await Promise.all([
-        authFetch('http://127.0.0.1:5000/api/products').then((r) => r.json()),
-        authFetch('http://127.0.0.1:5000/api/batches').then((r) => r.json()),
-        authFetch('http://127.0.0.1:5000/api/tests').then((r) => r.json()),
-        authFetch('http://127.0.0.1:5000/api/test-results').then((r) => r.json()),
-        authFetch('http://127.0.0.1:5000/api/deviations').then((r) => r.json())
+        authFetch(`${API_BASE_URL}/api/products`).then((r) => r.json()),
+        authFetch(`${API_BASE_URL}/api/batches`).then((r) => r.json()),
+        authFetch(`${API_BASE_URL}/api/tests`).then((r) => r.json()),
+        authFetch(`${API_BASE_URL}/api/test-results`).then((r) => r.json()),
+        authFetch(`${API_BASE_URL}/api/deviations`).then((r) => r.json())
       ]);
 
       setProducts(productsRes || []);
@@ -99,7 +100,7 @@ function Dashboard() {
     setLoginError(null);
 
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: loginUsername, password: loginPassword })
@@ -139,7 +140,7 @@ function Dashboard() {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      const res = await authFetch('http://127.0.0.1:5000/api/products', {
+      const res = await authFetch(`${API_BASE_URL}/api/products`, {
         method: 'POST',
         body: JSON.stringify({ name: prodName, dosage_form: prodForm, strength: prodStrength, manufacturer_id: 1 })
       });
@@ -167,7 +168,7 @@ function Dashboard() {
     }
 
     try {
-      const res = await authFetch('http://127.0.0.1:5000/api/batches', {
+      const res = await authFetch(`${API_BASE_URL}/api/batches`, {
         method: 'POST',
         body: JSON.stringify({
           batch_number: batchNumber,
@@ -197,7 +198,7 @@ function Dashboard() {
     setTestMessage(null);
 
     try {
-      const res = await authFetch('http://127.0.0.1:5000/api/test-results', {
+      const res = await authFetch(`${API_BASE_URL}/api/test-results`, {
         method: 'POST',
         body: JSON.stringify({
           batch_id: parseInt(selectedBatchId, 10),
@@ -226,7 +227,7 @@ function Dashboard() {
   const handleAddCapa = async (e, devId) => {
     e.preventDefault();
     try {
-      const res = await authFetch('http://127.0.0.1:5000/api/corrective-actions', {
+      const res = await authFetch(`${API_BASE_URL}/api/corrective-actions`, {
         method: 'POST',
         body: JSON.stringify({ deviation_id: devId, description: capaDesc, target_date: capaDate })
       });
@@ -243,7 +244,7 @@ function Dashboard() {
 
   const handleCompleteCapa = async (actionId) => {
     try {
-      const res = await authFetch(`http://127.0.0.1:5000/api/corrective-actions/${actionId}/complete`, { method: 'PATCH' });
+      const res = await authFetch(`${API_BASE_URL}/api/corrective-actions/${actionId}/complete`, { method: 'PATCH' });
       if (!res.ok) throw new Error('Failed to complete action');
       fetchData();
     } catch (err) {
@@ -253,7 +254,7 @@ function Dashboard() {
 
   const handleCloseDeviation = async (devId) => {
     try {
-      const res = await authFetch(`http://127.0.0.1:5000/api/deviations/${devId}/close`, { method: 'PATCH' });
+      const res = await authFetch(`${API_BASE_URL}/api/deviations/${devId}/close`, { method: 'PATCH' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       fetchData();
@@ -365,7 +366,7 @@ function Dashboard() {
       {/* Admin Panel: Add Master Product (Admin Only) */}
       {isAdmin && (
         <section style={{ background: '#fef3c7', padding: '16px 20px', borderRadius: '8px', border: '1px solid #fcd34d', marginBottom: '24px' }}>
-          <h3 style={{ marginTop: 0, color: '#92400e', fontSize: '16px' }}>👑 Administrator Master Control: Add Approved Product</h3>
+          <h3 style={{ marginTop: 0, color: '#92400e', fontSize: '16px' }}>Add Approved Product</h3>
           {prodMessage && <div style={{ fontSize: '13px', marginBottom: '8px', color: prodMessage.type === 'success' ? '#155724' : '#721c24' }}>{prodMessage.text}</div>}
           <form onSubmit={handleAddProduct} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px' }}>
             <input type="text" placeholder="Product Name (e.g. Ciprofloxacin)" value={prodName} onChange={(e) => setProdName(e.target.value)} required style={{ padding: '6px' }} />
